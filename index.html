@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>75 Days — Your Tracker</title>
+
+<!-- PWA / "Add to Home Screen" support -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FAF7F2">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="75 Days">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF7F2;
+    --paper-soft:#F2EEE4;
+    --card:#FFFFFF;
+    --ink:#2B2A27;
+    --ink-soft:#6B6A63;
+    --ink-faint:#A8A599;
+    --line:#E6E1D6;
+    --sage:#6B9080;
+    --sage-light:#E3ECE7;
+    --sage-deep:#4F7560;
+    --amber:#E8A33D;
+    --amber-light:#FBEFDB;
+    --clay:#D98C6B;
+    --clay-light:#FAEAE2;
+    --sky:#5B8DBF;
+    --sky-light:#E2EBF4;
+    --sky-deep:#3D6E9E;
+    --coral:#E8714F;
+    --coral-light:#FBE5DD;
+    --coral-deep:#C8552F;
+    --gold:#C9962F;
+    --gold-light:#FAF1DC;
+    --violet:#8B7BB8;
+    --violet-light:#ECE7F5;
+    --shadow:0 2px 12px rgba(43,42,39,0.05), 0 1px 2px rgba(43,42,39,0.04);
+    --shadow-lift:0 8px 28px rgba(43,42,39,0.10), 0 2px 6px rgba(43,42,39,0.06);
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    position:relative;
+  }
+
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:0 24px 100px;
+  }
+
+  /* ============ HEADER ============ */
+
+  header.top{
+    padding:48px 0 32px;
+  }
+
+  .top-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:36px;
+  }
+
+  .brand{
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    font-weight:600;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+  .brand span{ color:var(--sage-deep); }
+
+  .today-date{
+    font-size:12.5px;
+    color:var(--ink-faint);
+    font-weight:500;
+  }
+
+  .hero-card{
+    background:var(--card);
+    border-radius:28px;
+    box-shadow:var(--shadow);
+    padding:36px 32px;
+    display:flex;
+    align-items:center;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+
+  .ring-wrap{
+    position:relative;
+    width:148px;
+    height:148px;
+    flex-shrink:0;
+  }
+  .ring-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .ring-bg{ fill:none; stroke:var(--paper-soft); stroke-width:10; }
+  .ring-fill{
+    fill:none;
+    stroke:var(--sage);
+    stroke-width:10;
+    stroke-linecap:round;
+    transition:stroke-dashoffset 0.7s cubic-bezier(.4,0,.2,1);
+  }
+  .ring-center{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+  .ring-day{
+    font-family:'Fraunces', serif;
+    font-size:42px;
+    font-weight:600;
+    line-height:1;
+    color:var(--ink);
+  }
+  .ring-of{
+    font-size:11px;
+    color:var(--ink-faint);
+    font-weight:600;
+    letter-spacing:0.04em;
+    margin-top:2px;
+  }
+
+  .hero-text{
+    flex:1;
+    min-width:200px;
+  }
+  .hero-greeting{
+    font-family:'Fraunces', serif;
+    font-size:24px;
+    font-weight:500;
+    color:var(--ink);
+    line-height:1.3;
+    margin-bottom:6px;
+  }
+  .hero-sub{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    line-height:1.5;
+    margin-bottom:18px;
+  }
+
+  .stat-pills{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .pill{
+    background:var(--paper-soft);
+    border-radius:100px;
+    padding:8px 14px;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .pill .dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--sage);
+  }
+  .pill.amber .dot{ background:var(--amber); }
+  .pill.sky .dot{ background:var(--sky); }
+  .pill.coral .dot{ background:var(--coral); }
+  .pill b{ color:var(--ink); font-weight:700; }
+
+  /* ============ BACKGROUND QUOTE WATERMARKS ============ */
+
+  .quote-layer{
+    position:absolute;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:0;
+    overflow:hidden;
+  }
+  .bg-quote{
+    position:absolute;
+    left:50%;
+    transform:translate(-50%, -50%) rotate(var(--tilt, -2deg));
+    width:100%;
+    text-align:center;
+    padding:0 18px;
+    opacity:0.45;
+  }
+  .bg-quote .hindi{
+    font-family:'Tiro Devanagari Hindi', serif;
+    font-size:clamp(20px, 5.2vw, 30px);
+    color:var(--gold);
+    line-height:1.25;
+    opacity:0.55;
+  }
+  .bg-quote .eng{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:clamp(14px, 3.4vw, 19px);
+    color:var(--sage-deep);
+    opacity:0.42;
+    margin-top:1px;
+  }
+  .bg-quote.coral .eng{ color:var(--coral-deep); }
+  .bg-quote.sky .eng{ color:var(--sky-deep); }
+  .bg-quote.violet .eng{ color:var(--violet); }
+  .bg-quote.sage .eng{ color:var(--sage-deep); }
+
+  .wrap{ position:relative; z-index:1; }
+  header.top, .scene-card, .trail-card, .today-panel, .ledger-head, .ledger-collapse, .foot{
+    position:relative;
+    z-index:1;
+  }
+
+  /* ============ PROGRESS SCENE (signature element) ============ */
+
+  .scene-card{
+    margin-top:56px;
+    background:var(--card);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    padding:24px 28px 28px;
+  }
+  .scene-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:14px;
+  }
+  .scene-title{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .scene-stage-label{
+    font-size:12px;
+    color:var(--ink-faint);
+    font-weight:600;
+  }
+  .scene-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+  }
+  .scene-panel{
+    background:var(--paper-soft);
+    border-radius:18px;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  .scene-panel.code{ background:var(--sky-light); }
+  .scene-panel.fit{ background:var(--coral-light); }
+  .scene-panel svg{ width:100%; height:auto; max-width:160px; }
+  .scene-label{
+    font-size:12px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  .scene-panel.code .scene-label{ color:var(--sky-deep); }
+  .scene-panel.fit .scene-label{ color:var(--coral-deep); }
+
+  @media (max-width:560px){
+    .scene-grid{ grid-template-columns:1fr; }
+  }
+
+  /* ============ DOT TRAIL (signature element) ============ */
+
+  .trail-card{
+    margin-top:56px;
+    background:var(--card);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    padding:24px 28px;
+  }
+  .trail-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:16px;
+  }
+  .trail-title{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .trail-count{
+    font-size:12px;
+    color:var(--ink-faint);
+    font-weight:500;
+  }
+  .trail-grid{
+    display:grid;
+    grid-template-columns:repeat(25, 1fr);
+    gap:6px;
+  }
+  .trail-dot{
+    aspect-ratio:1;
+    border-radius:50%;
+    background:var(--paper-soft);
+    border:1.5px solid var(--line);
+    transition:all 0.3s ease;
+  }
+  .trail-dot.done{
+    background:linear-gradient(135deg, var(--sage) 0%, var(--sky) 100%);
+    border-color:var(--sage);
+  }
+  .trail-dot.failed{
+    background:var(--clay-light);
+    border-color:var(--clay);
+  }
+  .trail-dot.today{
+    border-color:var(--amber);
+    border-width:2px;
+    background:var(--amber-light);
+    box-shadow:0 0 0 3px var(--amber-light);
+  }
+  @media (max-width:560px){
+    .trail-grid{ grid-template-columns:repeat(15,1fr); }
+  }
+
+  /* ============ TODAY PANEL ============ */
+
+  .today-panel{
+    margin-top:56px;
+    background:var(--card);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+
+  .today-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:24px 28px 18px;
+  }
+  .today-head .label{
+    font-family:'Fraunces', serif;
+    font-size:19px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .today-count{
+    font-size:12.5px;
+    color:var(--ink-faint);
+    font-weight:600;
+  }
+  .today-count b{ color:var(--sage-deep); }
+
+  .task-list{ padding:0 16px; }
+
+  .task-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 12px;
+    border-radius:14px;
+    cursor:pointer;
+    transition:background 0.15s ease;
+  }
+  .task-row:hover{ background:var(--paper-soft); }
+
+  .check-circle{
+    width:24px; height:24px;
+    border-radius:50%;
+    border:2px solid var(--line);
+    flex-shrink:0;
+    position:relative;
+    transition:all 0.2s ease;
+  }
+  .task-row.checked .check-circle{
+    background:var(--sage);
+    border-color:var(--sage);
+  }
+  .check-circle::after{
+    content:"";
+    position:absolute;
+    left:7px; top:3px;
+    width:6px; height:11px;
+    border-right:2.5px solid white;
+    border-bottom:2.5px solid white;
+    transform:rotate(45deg);
+    opacity:0;
+    transition:opacity 0.15s ease;
+  }
+  .task-row.checked .check-circle::after{ opacity:1; }
+
+  .task-text{
+    font-size:14.5px;
+    color:var(--ink);
+    flex:1;
+    font-weight:500;
+  }
+  .task-row.checked .task-text{
+    color:var(--ink-faint);
+    text-decoration:line-through;
+    text-decoration-color:var(--ink-faint);
+  }
+
+  .task-remove{
+    width:26px; height:26px;
+    border-radius:50%;
+    border:none;
+    background:transparent;
+    color:var(--ink-faint);
+    font-size:16px;
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0;
+    transition:opacity 0.15s ease, background 0.15s ease;
+  }
+  .task-row:hover .task-remove{ opacity:1; }
+  .task-remove:hover{ background:var(--clay-light); color:var(--clay); }
+
+  .add-task-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px;
+    margin:4px 12px 8px;
+  }
+  .add-task-row input{
+    flex:1;
+    border:1.5px dashed var(--line);
+    background:transparent;
+    border-radius:12px;
+    padding:11px 14px;
+    font-size:13.5px;
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    outline:none;
+    transition:border-color 0.2s ease;
+  }
+  .add-task-row input:focus{ border-color:var(--sage); border-style:solid; }
+  .add-task-row input::placeholder{ color:var(--ink-faint); }
+  .add-task-btn{
+    width:38px; height:38px;
+    border-radius:12px;
+    border:none;
+    background:var(--sage);
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background 0.15s ease;
+  }
+  .add-task-btn:hover{ background:var(--sage-deep); }
+
+  .notes-field{
+    margin:6px 16px 18px;
+    padding:14px 16px;
+    background:var(--paper-soft);
+    border-radius:14px;
+  }
+  .notes-field textarea{
+    width:100%;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    font-size:13px;
+    resize:vertical;
+    min-height:40px;
+    line-height:1.5;
+  }
+  .notes-field textarea::placeholder{ color:var(--ink-faint); }
+  .notes-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:8px;
+    display:block;
+  }
+
+  .today-actions{
+    display:flex;
+    gap:10px;
+    padding:8px 16px 20px;
+  }
+  .btn{
+    flex:1;
+    padding:16px;
+    text-align:center;
+    font-family:'Inter', sans-serif;
+    font-size:13.5px;
+    font-weight:700;
+    border-radius:14px;
+    border:none;
+    cursor:pointer;
+    transition:all 0.2s ease;
+  }
+  .btn.fail{
+    background:transparent;
+    color:var(--ink-faint);
+    border:1.5px solid var(--line);
+  }
+  .btn.fail:hover{ background:var(--clay-light); color:var(--clay); border-color:var(--clay); }
+  .btn.complete{
+    background:var(--ink-faint);
+    color:white;
+    opacity:0.5;
+  }
+  .btn.complete.ready{
+    background:var(--sage);
+    opacity:1;
+  }
+  .btn.complete.ready:hover{ background:var(--sage-deep); }
+  .btn.complete:disabled{ cursor:not-allowed; }
+
+  /* ============ SETUP TASK LIST (config mode) ============ */
+  .setup-card{
+    background:var(--card);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    padding:28px;
+    margin-top:18px;
+  }
+  .setup-title{
+    font-family:'Fraunces', serif;
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .setup-sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+    line-height:1.5;
+  }
+  .setup-list{ margin-bottom:14px; }
+  .setup-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    background:var(--paper-soft);
+    border-radius:12px;
+    margin-bottom:8px;
+  }
+  .setup-item-text{ flex:1; font-size:14px; font-weight:500; }
+  .setup-item-remove{
+    width:24px; height:24px;
+    border-radius:50%;
+    border:none;
+    background:transparent;
+    color:var(--ink-faint);
+    cursor:pointer;
+    font-size:15px;
+  }
+  .setup-item-remove:hover{ background:var(--clay-light); color:var(--clay); }
+
+  /* ============ LEDGER ============ */
+
+  .ledger-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:40px;
+    margin-bottom:0;
+    padding:18px 20px;
+    background:var(--card);
+    border-radius:20px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    user-select:none;
+    transition:border-radius 0.2s ease;
+  }
+  .ledger-head.open{
+    border-radius:20px 20px 0 0;
+    margin-bottom:0;
+  }
+  .ledger-head:hover{ background:var(--paper-soft); }
+  .ledger-head-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .ledger-title{
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .ledger-sub{
+    font-size:12px;
+    color:var(--ink-faint);
+    font-weight:500;
+  }
+  .ledger-chevron{
+    font-size:13px;
+    color:var(--ink-faint);
+    transition:transform 0.3s ease;
+    flex-shrink:0;
+  }
+  .ledger-head.open .ledger-chevron{ transform:rotate(180deg); }
+
+  .ledger-collapse{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.35s ease;
+    border-radius:0 0 20px 20px;
+  }
+  .ledger-collapse.open{
+    max-height:4000px;
+    transition:max-height 0.5s ease;
+  }
+
+  .ledger{
+    background:var(--card);
+    border-radius:0 0 20px 20px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+
+  .ledger-row{
+    display:grid;
+    grid-template-columns:40px 1fr auto 90px;
+    align-items:center;
+    gap:14px;
+    padding:13px 20px;
+    border-bottom:1px solid var(--line);
+  }
+  .ledger-row:last-child{ border-bottom:none; }
+
+  .ledger-day-num{
+    font-family:'Fraunces', serif;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink-faint);
+  }
+  .ledger-row.done .ledger-day-num{ color:var(--ink); }
+  .ledger-row.failed .ledger-day-num{ color:var(--clay); }
+  .ledger-row.today .ledger-day-num{ color:var(--amber); }
+
+  .ledger-badge{
+    font-size:11px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:100px;
+    white-space:nowrap;
+    justify-self:start;
+  }
+  .ledger-badge.done{ background:var(--sage-light); color:var(--sage-deep); }
+  .ledger-badge.failed{ background:var(--clay-light); color:var(--clay); }
+  .ledger-badge.today{ background:var(--amber-light); color:#9C6B1F; }
+  .ledger-badge.future{ background:var(--paper-soft); color:var(--ink-faint); }
+
+  .ledger-ticks{
+    font-size:12px;
+    color:var(--ink-faint);
+    font-weight:500;
+  }
+  .ledger-row.done .ledger-ticks{ color:var(--sage-deep); }
+
+  .ledger-date{
+    font-size:11.5px;
+    color:var(--ink-faint);
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  .ledger-row.future{ opacity:0.55; }
+
+  /* ============ RESTART OVERLAY (gentle) ============ */
+
+  .restart-overlay{
+    position:fixed; inset:0;
+    background:rgba(43,42,39,0.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.3s ease;
+    padding:24px;
+  }
+  .restart-overlay.show{ opacity:1; pointer-events:all; }
+
+  .restart-card{
+    background:var(--card);
+    border-radius:28px;
+    padding:40px 36px;
+    text-align:center;
+    max-width:380px;
+    box-shadow:var(--shadow-lift);
+    transform:translateY(10px) scale(0.97);
+    transition:transform 0.4s cubic-bezier(.34,1.2,.64,1);
+  }
+  .restart-overlay.show .restart-card{ transform:translateY(0) scale(1); }
+
+  .restart-icon{
+    width:64px; height:64px;
+    border-radius:50%;
+    background:var(--clay-light);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 20px;
+    font-size:28px;
+  }
+  .restart-title{
+    font-family:'Fraunces', serif;
+    font-size:21px;
+    font-weight:600;
+    color:var(--ink);
+    margin-bottom:10px;
+  }
+  .restart-text{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    margin-bottom:28px;
+  }
+  .restart-text b{ color:var(--ink); }
+  .restart-actions button{
+    font-family:'Inter', sans-serif;
+    font-size:13.5px;
+    font-weight:700;
+    padding:14px 32px;
+    border-radius:14px;
+    border:none;
+    background:var(--sage);
+    color:white;
+    cursor:pointer;
+    transition:background 0.2s ease;
+    width:100%;
+  }
+  .restart-actions button:hover{ background:var(--sage-deep); }
+
+  /* ============ COMPLETION OVERLAY ============ */
+  .complete-overlay{
+    position:fixed; inset:0;
+    background:rgba(43,42,39,0.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.4s ease;
+    padding:24px;
+  }
+  .complete-overlay.show{ opacity:1; pointer-events:all; }
+  .complete-card{
+    background:var(--card);
+    border-radius:28px;
+    padding:44px 36px;
+    text-align:center;
+    max-width:400px;
+    box-shadow:var(--shadow-lift);
+  }
+  .complete-icon{
+    width:72px; height:72px;
+    border-radius:50%;
+    background:var(--amber-light);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 22px;
+    font-size:32px;
+  }
+  .complete-title{
+    font-family:'Fraunces', serif;
+    font-size:26px;
+    font-weight:600;
+    color:var(--ink);
+    margin-bottom:12px;
+  }
+  .complete-text{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    margin-bottom:28px;
+  }
+  .complete-actions button{
+    font-family:'Inter', sans-serif;
+    font-size:13.5px;
+    font-weight:700;
+    padding:14px 32px;
+    border-radius:14px;
+    border:none;
+    background:var(--amber);
+    color:white;
+    cursor:pointer;
+    width:100%;
+  }
+  .complete-actions button:hover{ background:#D4912E; }
+
+  /* ============ START SCREEN ============ */
+  .start-overlay{
+    position:fixed; inset:0;
+    background:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:24px;
+    overflow-y:auto;
+  }
+  .start-card{
+    max-width:460px;
+    width:100%;
+    text-align:center;
+    padding:40px 0;
+  }
+  .start-icon{
+    width:64px; height:64px;
+    border-radius:50%;
+    background:var(--sage-light);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 24px;
+    font-size:28px;
+  }
+  .start-title{
+    font-family:'Fraunces', serif;
+    font-size:clamp(36px, 8vw, 46px);
+    font-weight:600;
+    line-height:1.15;
+    margin-bottom:12px;
+    color:var(--ink);
+  }
+  .start-desc{
+    font-size:14px;
+    color:var(--ink-soft);
+    line-height:1.7;
+    margin-bottom:32px;
+    max-width:380px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  .setup-form{
+    text-align:left;
+    background:var(--card);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    padding:28px;
+    margin-bottom:24px;
+  }
+  .setup-form-label{
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--ink-faint);
+    margin-bottom:14px;
+    display:block;
+  }
+  .start-btn{
+    font-family:'Inter', sans-serif;
+    font-size:14.5px;
+    font-weight:700;
+    padding:17px 48px;
+    background:var(--sage);
+    border:none;
+    border-radius:16px;
+    color:white;
+    cursor:pointer;
+    transition:background 0.2s ease;
+    width:100%;
+  }
+  .start-btn:hover{ background:var(--sage-deep); }
+  .start-btn:disabled{ background:var(--ink-faint); cursor:not-allowed; }
+
+  .suggestion-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:14px;
+  }
+  .chip{
+    font-size:12px;
+    font-weight:600;
+    padding:8px 14px;
+    border-radius:100px;
+    border:1.5px solid var(--line);
+    background:transparent;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all 0.15s ease;
+  }
+  .chip:hover{ border-color:var(--sage); color:var(--sage-deep); background:var(--sage-light); }
+
+  /* footer */
+  .foot{
+    margin-top:40px;
+    padding-top:24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .foot-text{
+    font-size:11.5px;
+    color:var(--ink-faint);
+  }
+  .foot-link{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    font-weight:600;
+    cursor:pointer;
+    background:none;
+    border:none;
+    font-family:'Inter', sans-serif;
+  }
+  .foot-link:hover{ color:var(--clay); }
+
+  @media (max-width:560px){
+    .ledger-row{ grid-template-columns:30px 1fr 70px; gap:8px; }
+    .ledger-ticks{ display:none; }
+    .hero-card{ padding:28px 22px; }
+    .ring-wrap{ width:120px; height:120px; }
+    .ring-day{ font-size:34px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
+
+  :focus-visible{
+    outline:2px solid var(--sage-deep);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- START / SETUP -->
+<div class="start-overlay" id="startOverlay">
+  <div class="start-card">
+    <div class="start-icon">🌱</div>
+    <div class="start-title">75 days,<br>one day at a time.</div>
+    <div class="start-desc">
+      Set the tasks that matter to you. Same list, every day, for 75 days straight. Miss a day, and you start the count over — but every attempt stays on your record.
+    </div>
+
+    <div class="setup-form">
+      <span class="setup-form-label">Your daily tasks</span>
+      <div class="setup-list" id="setupList"></div>
+      <div class="add-task-row" style="margin:0; padding:0;">
+        <input type="text" id="setupInput" placeholder="e.g. Drink 3L of water" maxlength="60">
+        <button class="add-task-btn" id="setupAddBtn" aria-label="Add task">+</button>
+      </div>
+      <div class="suggestion-chips" id="suggestionChips"></div>
+    </div>
+
+    <button class="start-btn" id="startBtn" disabled>Add at least one task to begin</button>
+  </div>
+</div>
+
+<div class="quote-layer" id="quoteLayer"></div>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="top-row">
+      <div class="brand">🌱 <span>75 Days</span></div>
+      <div class="today-date" id="todayDate">—</div>
+    </div>
+
+    <div class="hero-card">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 148 148">
+          <circle class="ring-bg" cx="74" cy="74" r="64"></circle>
+          <circle class="ring-fill" id="ringFill" cx="74" cy="74" r="64" stroke-dasharray="402" stroke-dashoffset="402"></circle>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-day" id="ringDay">1</div>
+          <div class="ring-of">OF 75</div>
+        </div>
+      </div>
+      <div class="hero-text">
+        <div class="hero-greeting" id="heroGreeting">Let's start day one.</div>
+        <div class="hero-sub" id="heroSub">Every day you complete builds the streak. Stay consistent — you've got this.</div>
+        <div class="stat-pills">
+          <div class="pill"><span class="dot"></span>Best streak: <b id="pillBest">0</b></div>
+          <div class="pill amber"><span class="dot"></span>Completed: <b id="pillCompleted">0</b></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="scene-card">
+    <div class="scene-head">
+      <div class="scene-title">🚀 Your Progress</div>
+      <div class="scene-stage-label" id="sceneStageLabel">Day 1 of 75</div>
+    </div>
+    <div class="scene-grid">
+      <div class="scene-panel code">
+        <div id="codeScene"></div>
+        <div class="scene-label">💻 Code Streak</div>
+      </div>
+      <div class="scene-panel fit">
+        <div id="fitScene"></div>
+        <div class="scene-label">💪 Strength Gains</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="trail-card">
+    <div class="trail-head">
+      <div class="trail-title">Your Path</div>
+      <div class="trail-count" id="trailCount">0 of 75 days</div>
+    </div>
+    <div class="trail-grid" id="trailGrid"></div>
+  </div>
+
+  <div class="today-panel">
+    <div class="today-head">
+      <div class="label">Today</div>
+      <div class="today-count"><b id="todayCount">0</b>/<span id="todayTotal">0</span> done</div>
+    </div>
+    <div class="task-list" id="taskList"></div>
+
+    <div class="add-task-row">
+      <input type="text" id="taskInput" placeholder="Add a task for today's list…" maxlength="60">
+      <button class="add-task-btn" id="addTaskBtn" aria-label="Add task">+</button>
+    </div>
+
+    <div class="notes-field">
+      <span class="notes-label">Notes</span>
+      <textarea id="notesInput" placeholder="How did today go?"></textarea>
+    </div>
+
+    <div class="today-actions">
+      <button class="btn fail" id="failBtn">I missed today</button>
+      <button class="btn complete" id="completeBtn" disabled>Complete Day</button>
+    </div>
+  </div>
+
+  <div class="ledger-head" id="ledgerHead">
+    <div class="ledger-head-left">
+      <span>📜</span>
+      <div class="ledger-title">History</div>
+      <div class="ledger-sub" id="ledgerSub">0 of 75 logged</div>
+    </div>
+    <div class="ledger-chevron" id="ledgerChevron">▾</div>
+  </div>
+  <div class="ledger-collapse" id="ledgerCollapse">
+    <div class="ledger" id="ledger"></div>
+  </div>
+
+  <div class="foot">
+    <div class="foot-text">Saved on this device only.</div>
+    <button class="foot-link" id="resetAllBtn">Start a new 75-day run</button>
+  </div>
+
+</div>
+
+<!-- RESTART OVERLAY -->
+<div class="restart-overlay" id="restartOverlay">
+  <div class="restart-card">
+    <div class="restart-icon">↺</div>
+    <div class="restart-title">Back to Day 1</div>
+    <div class="restart-text">Day <b id="restartFailedDay"></b> didn't get finished, so the streak resets — that's how this challenge works. You made it <b id="restartStreakLen"></b> days that time. Every run gets you better at this.</div>
+    <div class="restart-actions">
+      <button id="restartAck">Start today fresh</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPLETE 75 OVERLAY -->
+<div class="complete-overlay" id="completeOverlay">
+  <div class="complete-card">
+    <div class="complete-icon">🏆</div>
+    <div class="complete-title">75 days done.</div>
+    <div class="complete-text">You showed up for yourself every single day for 75 days straight. That consistency is yours now — take it with you into whatever's next.</div>
+    <div class="complete-actions">
+      <button id="completeAck">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- GENERIC CONFIRM OVERLAY -->
+<div class="restart-overlay" id="confirmOverlay">
+  <div class="restart-card">
+    <div class="restart-icon" id="confirmIcon">⚠️</div>
+    <div class="restart-title" id="confirmTitle">Are you sure?</div>
+    <div class="restart-text" id="confirmText"></div>
+    <div class="restart-actions" style="display:flex; gap:10px;">
+      <button id="confirmCancelBtn" style="background:transparent; border:1.5px solid var(--line); color:var(--ink-soft);">Cancel</button>
+      <button id="confirmOkBtn">Yes, continue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+(function(){
+  const STORAGE_KEY = '75days_tracker_v2';
+  const SUGGESTIONS = [
+    '💪 Workout 45 minutes', '💧 Drink 3L of water', '📖 Read 10 pages',
+    '🚫 No alcohol', '📸 Take a progress photo', '🧘 Meditate 10 minutes',
+    '🍬 No sugar', '😴 Sleep 7+ hours', '🚶 Walk outside', '💻 Code for 1 hour'
+  ];
+
+  let state = loadState();
+  let setupTasks = []; // used only during onboarding
+
+  function defaultState(){
+    return {
+      taskDefs: [],         // [{id, text}]
+      currentDay: 1,
+      todayTasks: {},        // taskId -> bool
+      todayNotes: '',
+      history: [],           // {day, runId, status, date, doneCount, total, notes}
+      resets: 0,
+      bestStreak: 0,
+      started: false
+    };
+  }
+
+  function removeLegacyPermanentTask(s){
+    // earlier version had a non-removable "Keep smiling, stay happy" task — strip it out for existing users
+    if(s.taskDefs){
+      s.taskDefs = s.taskDefs.filter(t=>t.id!=='permanent_smile');
+    }
+    if(s.todayTasks){
+      delete s.todayTasks['permanent_smile'];
+    }
+    return s;
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return defaultState();
+      return removeLegacyPermanentTask(Object.assign(defaultState(), JSON.parse(raw)));
+    }catch(e){ return defaultState(); }
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  function uid(){ return 't' + Math.random().toString(36).slice(2,9); }
+
+  function todayLabel(){
+    return new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+  }
+  function shortDate(){
+    return new Date().toLocaleDateString(undefined, { month:'short', day:'numeric' });
+  }
+
+  // ---------- SETUP SCREEN ----------
+
+  function renderSuggestionChips(){
+    const box = document.getElementById('suggestionChips');
+    box.innerHTML = '';
+    SUGGESTIONS.forEach(s=>{
+      if(setupTasks.find(t=>t.text===s)) return;
+      const chip = document.createElement('button');
+      chip.className = 'chip';
+      chip.type = 'button';
+      chip.textContent = '+ ' + s;
+      chip.addEventListener('click', ()=> addSetupTask(s));
+      box.appendChild(chip);
+    });
+  }
+
+  function renderSetupList(){
+    const list = document.getElementById('setupList');
+    list.innerHTML = '';
+    setupTasks.forEach(t=>{
+      const item = document.createElement('div');
+      item.className = 'setup-item';
+      item.innerHTML = `<div class="setup-item-text">${escapeHtml(t.text)}</div>
+        <button class="setup-item-remove" aria-label="Remove">✕</button>`;
+      item.querySelector('.setup-item-remove').addEventListener('click', ()=>{
+        setupTasks = setupTasks.filter(x=>x.id!==t.id);
+        renderSetupList();
+        renderSuggestionChips();
+        updateStartBtn();
+      });
+      list.appendChild(item);
+    });
+    renderSuggestionChips();
+  }
+
+  function addSetupTask(text){
+    text = text.trim();
+    if(!text) return;
+    if(setupTasks.find(t=>t.text.toLowerCase()===text.toLowerCase())) return;
+    setupTasks.push({ id: uid(), text });
+    renderSetupList();
+    updateStartBtn();
+  }
+
+  function updateStartBtn(){
+    const btn = document.getElementById('startBtn');
+    if(setupTasks.length === 0){
+      btn.disabled = true;
+      btn.textContent = 'Add at least one task to begin';
+    } else {
+      btn.disabled = false;
+      btn.textContent = `Begin Day 1 — ${setupTasks.length} task${setupTasks.length>1?'s':''}/day`;
+    }
+  }
+
+  document.getElementById('setupAddBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('setupInput');
+    addSetupTask(input.value);
+    input.value = '';
+    input.focus();
+  });
+  document.getElementById('setupInput').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      addSetupTask(e.target.value);
+      e.target.value = '';
+    }
+  });
+
+  document.getElementById('startBtn').addEventListener('click', ()=>{
+    if(setupTasks.length===0) return;
+    state.taskDefs = setupTasks;
+    state.todayTasks = {};
+    state.started = true;
+    saveState();
+    document.getElementById('startOverlay').style.display = 'none';
+    renderAll();
+  });
+
+  function escapeHtml(s){
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // ---------- MAIN RENDER ----------
+
+  function renderTasks(){
+    const list = document.getElementById('taskList');
+    list.innerHTML = '';
+    state.taskDefs.forEach(t=>{
+      const checked = !!state.todayTasks[t.id];
+      const row = document.createElement('div');
+      row.className = 'task-row' + (checked ? ' checked' : '');
+      row.setAttribute('role','checkbox');
+      row.setAttribute('aria-checked', checked?'true':'false');
+      row.tabIndex = 0;
+      row.innerHTML = `
+        <div class="check-circle"></div>
+        <div class="task-text">${escapeHtml(t.text)}</div>
+        <button class="task-remove" aria-label="Remove task">✕</button>
+      `;
+      row.querySelector('.check-circle').addEventListener('click', (e)=>{ e.stopPropagation(); toggleTask(t.id); });
+      row.querySelector('.task-text').addEventListener('click', ()=> toggleTask(t.id));
+      row.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleTask(t.id); }
+      });
+      row.querySelector('.task-remove').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        state.taskDefs = state.taskDefs.filter(x=>x.id!==t.id);
+        delete state.todayTasks[t.id];
+        saveState();
+        renderAll();
+      });
+      list.appendChild(row);
+    });
+
+    document.getElementById('todayTotal').textContent = state.taskDefs.length;
+    const doneCount = state.taskDefs.filter(t=>state.todayTasks[t.id]).length;
+    document.getElementById('todayCount').textContent = doneCount;
+    document.getElementById('notesInput').value = state.todayNotes || '';
+
+    const completeBtn = document.getElementById('completeBtn');
+    const total = state.taskDefs.length;
+    if(total > 0 && doneCount === total){
+      completeBtn.classList.add('ready');
+      completeBtn.disabled = false;
+      completeBtn.textContent = 'Complete Day ✓';
+    } else {
+      completeBtn.classList.remove('ready');
+      completeBtn.disabled = true;
+      completeBtn.textContent = total ? `Complete Day (${doneCount}/${total})` : 'Add a task first';
+    }
+  }
+
+  function toggleTask(id){
+    state.todayTasks[id] = !state.todayTasks[id];
+    saveState();
+    renderTasks();
+  }
+
+  document.getElementById('addTaskBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('taskInput');
+    addLiveTask(input.value);
+    input.value = '';
+    input.focus();
+  });
+  document.getElementById('taskInput').addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'){ e.preventDefault(); addLiveTask(e.target.value); e.target.value=''; }
+  });
+  function addLiveTask(text){
+    text = text.trim();
+    if(!text) return;
+    if(state.taskDefs.find(t=>t.text.toLowerCase()===text.toLowerCase())) return;
+    state.taskDefs.push({ id: uid(), text });
+    saveState();
+    renderAll();
+  }
+
+  document.getElementById('notesInput').addEventListener('input', (e)=>{
+    state.todayNotes = e.target.value;
+    saveState();
+  });
+
+  function renderHero(){
+    const day = state.currentDay;
+    const doneInRun = state.history.filter(h=>h.status==='done' && h.runId===currentRunId()).length;
+    document.getElementById('ringDay').textContent = day;
+    document.getElementById('todayDate').textContent = todayLabel();
+
+    const completed = state.history.filter(h=>h.status==='done').length;
+    document.getElementById('pillCompleted').textContent = completed;
+    document.getElementById('pillBest').textContent = Math.max(state.bestStreak, doneInRun);
+
+    const circumference = 402;
+    const pct = Math.min(1, doneInRun/75);
+    const offset = circumference * (1-pct);
+    document.getElementById('ringFill').style.strokeDashoffset = offset;
+
+    const greetings = [
+      "Let's start day one.",
+      "Good — keep the streak alive.",
+      "Halfway-ish, stay with it.",
+      "You're deep in it now.",
+      "The finish line is close."
+    ];
+    let g = greetings[0];
+    if(day > 1 && day <= 20) g = greetings[1];
+    else if(day > 20 && day <= 45) g = greetings[2];
+    else if(day > 45 && day <= 65) g = greetings[3];
+    else if(day > 65) g = greetings[4];
+    document.getElementById('heroGreeting').textContent = day===1 ? greetings[0] : `Day ${day} of 75.`;
+    document.getElementById('heroSub').textContent = g === greetings[0]
+      ? 'Every day you complete builds the streak. Stay consistent — you\'ve got this.'
+      : g;
+
+    document.getElementById('sceneStageLabel').textContent = `Day ${day} of 75`;
+    renderScenes(doneInRun);
+  }
+
+  function stageOf(doneInRun){
+    // 0-4 stage index across 75 days
+    if(doneInRun <= 0) return 0;
+    if(doneInRun < 15) return 1;
+    if(doneInRun < 35) return 2;
+    if(doneInRun < 60) return 3;
+    return 4;
+  }
+
+  function renderScenes(doneInRun){
+    const stage = stageOf(doneInRun);
+    document.getElementById('codeScene').innerHTML = codeSceneSVG(stage);
+    document.getElementById('fitScene').innerHTML = fitSceneSVG(stage);
+  }
+
+  function codeSceneSVG(stage){
+    // stage 0: blank screen / 1: a few lines / 2: half screen + 1 commit bar /
+    // 3: full screen + several commit bars / 4: full screen, green "ship it" bars, badge
+    const lineCounts = [0,2,4,6,8];
+    const barHeights = [
+      [4,4,4,4,4],
+      [10,4,4,4,4],
+      [14,20,10,4,4],
+      [18,26,14,22,10],
+      [24,30,20,28,26]
+    ];
+    const lines = lineCounts[stage];
+    const bars = barHeights[stage];
+    const lineColors = ['#5B8DBF','#8B7BB8','#E8714F','#6B9080','#C9962F','#5B8DBF','#8B7BB8','#E8714F'];
+    let lineEls = '';
+    for(let i=0;i<lines;i++){
+      const w = 30 + ((i*17)%50);
+      lineEls += `<rect x="14" y="${20+i*9}" width="${w}" height="4" rx="2" fill="${lineColors[i%lineColors.length]}" opacity="0.85"/>`;
+    }
+    let barEls = '';
+    bars.forEach((h,i)=>{
+      barEls += `<rect x="${14+i*16}" y="${100-h}" width="10" height="${h}" rx="2" fill="${i===bars.length-1 && stage===4 ? '#6B9080' : '#5B8DBF'}"/>`;
+    });
+    const badge = stage===4 ? `<circle cx="142" cy="16" r="11" fill="#6B9080"/><path d="M137 16l3.5 3.5L147 12" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` : '';
+    return `
+    <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="152" height="92" rx="8" fill="#1E2B3A"/>
+      <rect x="4" y="4" width="152" height="14" rx="8" fill="#16202B"/>
+      <circle cx="13" cy="11" r="2.3" fill="#E8714F"/>
+      <circle cx="21" cy="11" r="2.3" fill="#C9962F"/>
+      <circle cx="29" cy="11" r="2.3" fill="#6B9080"/>
+      ${lineEls}
+      ${badge}
+      <line x1="4" y1="106" x2="156" y2="106" stroke="#E6E1D6" stroke-width="1"/>
+      ${barEls}
+    </svg>`;
+  }
+
+  function fitSceneSVG(stage){
+    // figure gets visibly stronger: wider shoulders/arms, heavier dumbbell, more sweat/stars
+    const armWidth = [3,4,5,6.5,8][stage];
+    const plateSize = [10,12,15,18,22][stage];
+    const glow = stage>=3;
+    const stars = stage===4 ? `
+      <text x="18" y="22" font-size="12">✨</text>
+      <text x="132" y="28" font-size="12">✨</text>` : '';
+    const sweat = stage>=2 ? `<text x="98" y="48" font-size="11">💦</text>` : '';
+    return `
+    <svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg">
+      ${glow ? '<ellipse cx="80" cy="100" rx="46" ry="8" fill="#E8714F" opacity="0.15"/>' : ''}
+      <!-- ground -->
+      <line x1="20" y1="104" x2="140" y2="104" stroke="#E6E1D6" stroke-width="2"/>
+      <!-- legs -->
+      <rect x="68" y="78" width="8" height="26" rx="3" fill="#2B2A27"/>
+      <rect x="84" y="78" width="8" height="26" rx="3" fill="#2B2A27"/>
+      <!-- torso -->
+      <rect x="64" y="50" width="32" height="32" rx="10" fill="#E8714F"/>
+      <!-- head -->
+      <circle cx="80" cy="38" r="13" fill="#F4C9A8"/>
+      <!-- arms holding bar -->
+      <rect x="${64-armWidth}" y="56" width="${armWidth}" height="22" rx="3" fill="#F4C9A8"/>
+      <rect x="96" y="56" width="${armWidth}" height="22" rx="3" fill="#F4C9A8"/>
+      <!-- barbell -->
+      <rect x="30" y="64" width="100" height="5" rx="2.5" fill="#2B2A27"/>
+      <rect x="${30-plateSize/2}" y="${66.5-plateSize}" width="${plateSize}" height="${plateSize*2}" rx="3" fill="#5B8DBF"/>
+      <rect x="${130-plateSize/2}" y="${66.5-plateSize}" width="${plateSize}" height="${plateSize*2}" rx="3" fill="#5B8DBF"/>
+      ${sweat}
+      ${stars}
+    </svg>`;
+  }
+
+  function currentRunId(){ return state.resets; }
+  function currentRunRecordForDay(d){
+    return state.history.find(h=>h.day===d && h.runId===currentRunId());
+  }
+
+  function renderTrail(){
+    const grid = document.getElementById('trailGrid');
+    grid.innerHTML = '';
+    let doneSoFar = 0;
+    for(let i=1;i<=75;i++){
+      const rec = currentRunRecordForDay(i);
+      const dot = document.createElement('div');
+      let cls = 'trail-dot';
+      if(rec){
+        cls += rec.status==='done' ? ' done' : ' failed';
+        if(rec.status==='done') doneSoFar++;
+      } else if(i === state.currentDay){
+        cls += ' today';
+      }
+      dot.className = cls;
+      dot.title = rec ? `Day ${i}: ${rec.status}` : (i===state.currentDay ? `Day ${i}: today` : `Day ${i}`);
+      grid.appendChild(dot);
+    }
+    document.getElementById('trailCount').textContent = `${doneSoFar} of 75 days`;
+  }
+
+  function renderLedger(){
+    const ledger = document.getElementById('ledger');
+    ledger.innerHTML = '';
+    let loggedCount = 0;
+    for(let i=1;i<=75;i++){
+      const rec = currentRunRecordForDay(i);
+      let status = 'future';
+      let badge = 'Upcoming';
+      let dateStr = '';
+      let ticksStr = '';
+
+      if(rec){
+        status = rec.status==='done' ? 'done' : 'failed';
+        badge = rec.status==='done' ? 'Completed' : 'Missed';
+        dateStr = rec.date;
+        ticksStr = `${rec.doneCount}/${rec.total} tasks`;
+        loggedCount++;
+      } else if(i === state.currentDay){
+        status = 'today';
+        badge = 'Today';
+        dateStr = 'Now';
+        const doneCount = state.taskDefs.filter(t=>state.todayTasks[t.id]).length;
+        ticksStr = `${doneCount}/${state.taskDefs.length} tasks`;
+      }
+
+      const row = document.createElement('div');
+      row.className = 'ledger-row ' + status;
+      row.innerHTML = `
+        <div class="ledger-day-num">${i}</div>
+        <div class="ledger-badge ${status}">${badge}</div>
+        <div class="ledger-ticks">${status!=='future' ? ticksStr : ''}</div>
+        <div class="ledger-date">${dateStr}</div>
+      `;
+      ledger.appendChild(row);
+    }
+    document.getElementById('ledgerSub').textContent = `${loggedCount} of 75 logged`;
+  }
+
+  function toggleLedger(){
+    const head = document.getElementById('ledgerHead');
+    const collapse = document.getElementById('ledgerCollapse');
+    head.classList.toggle('open');
+    collapse.classList.toggle('open');
+    setTimeout(positionQuoteLayer, 400);
+  }
+  document.getElementById('ledgerHead').addEventListener('click', toggleLedger);
+  document.getElementById('ledgerHead').setAttribute('tabindex','0');
+  document.getElementById('ledgerHead').setAttribute('role','button');
+  document.getElementById('ledgerHead').addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleLedger(); }
+  });
+
+  function renderAll(){
+    if(!state.started) return;
+    renderHero();
+    renderTasks();
+    renderTrail();
+    renderLedger();
+    requestAnimationFrame(positionQuoteLayer);
+  }
+
+  // ---------- BACKGROUND QUOTE WATERMARKS ----------
+  const BG_QUOTES = [
+    { hindi:'कृष्ण सदा सहायते', eng:'Krishna is always with you', tone:'gold' },
+    { hindi:'', eng:'You can, and you have to do it.', tone:'sky' },
+    { hindi:'', eng:'You are loved.', tone:'coral' },
+    { hindi:'', eng:'Keep going.', tone:'sage' },
+    { hindi:'', eng:'Hakuna Matata.', tone:'violet' },
+    { hindi:'कृष्ण सदा सहायते', eng:'Krishna is always with you', tone:'gold' },
+  ];
+
+  function buildQuoteLayer(){
+    const layer = document.getElementById('quoteLayer');
+    layer.innerHTML = '';
+    BG_QUOTES.forEach((q, i)=>{
+      const el = document.createElement('div');
+      el.className = 'bg-quote ' + q.tone;
+      el.style.setProperty('--tilt', (i % 2 === 0 ? '-2deg' : '2deg'));
+      el.dataset.index = i;
+      el.innerHTML = `
+        ${q.hindi ? `<div class="hindi">${q.hindi}</div>` : ''}
+        <div class="eng">${q.eng}</div>
+      `;
+      layer.appendChild(el);
+    });
+  }
+
+  function positionQuoteLayer(){
+    const layer = document.getElementById('quoteLayer');
+    const docHeight = document.body.scrollHeight;
+    layer.style.height = docHeight + 'px';
+
+    // find the visible content "blocks" (cards) in document order, then place
+    // one quote in the midpoint of each gap between consecutive blocks.
+    const selectors = ['.hero-card', '.scene-card', '.trail-card', '.today-panel', '.ledger-head', '.foot'];
+    const blocks = selectors
+      .map(sel => document.querySelector(sel))
+      .filter(Boolean)
+      .map(el => el.getBoundingClientRect());
+
+    const scrollY = window.scrollY || window.pageYOffset;
+    const gaps = [];
+    for(let i=0;i<blocks.length-1;i++){
+      const bottomOfThis = blocks[i].bottom + scrollY;
+      const topOfNext = blocks[i+1].top + scrollY;
+      if(topOfNext > bottomOfThis){
+        gaps.push((bottomOfThis + topOfNext) / 2);
+      }
+    }
+    // also one above the very first block (only if there's genuinely enough clear space below the header row)
+    if(blocks.length){
+      const headerRow = document.querySelector('.top-row');
+      const headerBottom = headerRow ? (headerRow.getBoundingClientRect().bottom + scrollY) : 0;
+      const firstTop = blocks[0].top + scrollY;
+      const clearSpace = firstTop - headerBottom;
+      if(clearSpace > 70){
+        gaps.unshift((headerBottom + firstTop) / 2);
+      }
+    }
+
+    const quotes = layer.querySelectorAll('.bg-quote');
+    quotes.forEach((el, i)=>{
+      if(gaps[i] !== undefined){
+        el.style.top = gaps[i] + 'px';
+        el.style.display = '';
+      } else {
+        // not enough gaps for this quote — hide rather than overlap a card
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  window.addEventListener('resize', ()=> requestAnimationFrame(positionQuoteLayer));
+
+  // ---------- ACTIONS ----------
+
+  function completeDay(){
+    const total = state.taskDefs.length;
+    const doneCount = state.taskDefs.filter(t=>state.todayTasks[t.id]).length;
+    if(total===0 || doneCount < total) return;
+
+    state.history.push({
+      day: state.currentDay, runId: currentRunId(), status:'done',
+      date: shortDate(), doneCount, total, notes: state.todayNotes
+    });
+
+    if(state.currentDay >= 75){
+      saveState();
+      renderAll();
+      showComplete();
+      return;
+    }
+    state.currentDay += 1;
+    state.todayTasks = {};
+    state.todayNotes = '';
+    saveState();
+    renderAll();
+  }
+
+  function failDay(){
+    const total = state.taskDefs.length;
+    const doneCount = state.taskDefs.filter(t=>state.todayTasks[t.id]).length;
+    state.history.push({
+      day: state.currentDay, runId: currentRunId(), status:'failed',
+      date: shortDate(), doneCount, total, notes: state.todayNotes
+    });
+    state.bestStreak = Math.max(state.bestStreak, state.currentDay - 1);
+    const failedDay = state.currentDay;
+    document.getElementById('restartFailedDay').textContent = failedDay;
+    document.getElementById('restartStreakLen').textContent = (failedDay - 1);
+
+    state.resets += 1;
+    state.currentDay = 1;
+    state.todayTasks = {};
+    state.todayNotes = '';
+    saveState();
+    showRestart();
+  }
+
+  function showRestart(){ document.getElementById('restartOverlay').classList.add('show'); }
+  function hideRestart(){ document.getElementById('restartOverlay').classList.remove('show'); renderAll(); }
+  function showComplete(){ document.getElementById('completeOverlay').classList.add('show'); }
+  function hideComplete(){ document.getElementById('completeOverlay').classList.remove('show'); }
+
+  // ---------- IN-PAGE CONFIRM (replaces native confirm(), which can be blocked in embedded/app webviews) ----------
+  let pendingConfirmAction = null;
+  function showConfirm(title, text, icon, onConfirm){
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmText').textContent = text;
+    document.getElementById('confirmIcon').textContent = icon || '⚠️';
+    pendingConfirmAction = onConfirm;
+    document.getElementById('confirmOverlay').classList.add('show');
+  }
+  function hideConfirm(){
+    document.getElementById('confirmOverlay').classList.remove('show');
+    pendingConfirmAction = null;
+  }
+  document.getElementById('confirmOkBtn').addEventListener('click', ()=>{
+    const action = pendingConfirmAction;
+    hideConfirm();
+    if(action) action();
+  });
+  document.getElementById('confirmCancelBtn').addEventListener('click', hideConfirm);
+
+  document.getElementById('completeBtn').addEventListener('click', completeDay);
+  document.getElementById('failBtn').addEventListener('click', ()=>{
+    showConfirm(
+      'Mark today as missed?',
+      'Even one missed day resets the whole streak back to Day 1 — that\'s the rule. Your progress so far stays on record.',
+      '😔',
+      failDay
+    );
+  });
+  document.getElementById('restartAck').addEventListener('click', hideRestart);
+  document.getElementById('completeAck').addEventListener('click', hideComplete);
+
+  document.getElementById('resetAllBtn').addEventListener('click', ()=>{
+    showConfirm(
+      'Start a brand new run?',
+      'This erases your current history and task list completely, and can\'t be undone.',
+      '🔄',
+      ()=>{
+        state = defaultState();
+        setupTasks = [];
+        saveState();
+        renderSetupList();
+        updateStartBtn();
+        document.getElementById('startOverlay').style.display = 'flex';
+      }
+    );
+  });
+
+  // boot
+  buildQuoteLayer();
+  renderSetupList();
+  updateStartBtn();
+  if(state.started && state.taskDefs.length){
+    document.getElementById('startOverlay').style.display = 'none';
+    renderAll();
+  } else {
+    requestAnimationFrame(positionQuoteLayer);
+  }
+
+  // register service worker so the app works offline once installed/visited
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    });
+  }
+
+})();
+</script>
+
+</body>
+</html>
